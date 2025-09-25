@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HBnB — UML (Part 1) : Vues, Diagrammes & Glossaire</title>
+  <link rel="stylesheet" href="styles.css" />
+  <meta name="description" content="Article pédagogique sur l’utilité des diagrammes UML demandés dans HBnB Part 1 : package, classes, séquences, avec glossaire illustré." />
+</head>
+<body>
+  <a class="skip" href="#contenu">Aller au contenu</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <h1>HBnB — UML (Part 1)</h1>
+      <p class="subtitle">Utilité des vues & diagrammes demandés + glossaire des symboles</p>
+      <nav class="toc" aria-label="Sommaire">
+        <a href="#intro">Intro</a>
+        <a href="#package">Package</a>
+        <a href="#classes">Classes</a>
+        <a href="#sequences">Séquences</a>
+        <a href="#glossaire">Glossaire</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenu" class="wrap flow">
+    <!-- INTRO -->
+    <section id="intro" class="card">
+      <h2>De quoi parle cet article ?</h2>
+      <p>
+        Dans <strong>HBnB Part&nbsp;1</strong>, on te demande de documenter l’architecture et le design de ton clone d’AirBnB à l’aide de <strong>diagrammes UML</strong>.
+        Cet article t’explique <em>à quoi sert chaque type de diagramme demandé</em> et ce qu’il faut <em>montrer pour HBnB</em>, puis fournit un
+        <strong>glossaire illustré</strong> des principaux symboles UML.
+      </p>
+      <ul class="checklist">
+        <li><strong>Package (3 couches + Façade)</strong> : vue d’ensemble de l’architecture.</li>
+        <li><strong>Classe (Business Logic)</strong> : structure des entités (User, Place, Review, Amenity).</li>
+        <li><strong>Séquence (4 API)</strong> : déroulé des appels & échanges entre couches.</li>
+      </ul>
+    </section>
+
+    <!-- PACKAGE -->
+    <section id="package" class="card">
+      <h2>Diagramme de <span class="tag">Package</span> — Architecture 3 couches & Façade</h2>
+      <p class="lead">
+        <strong>À quoi ça sert ?</strong> Donner une <em>vue macro</em> de l’appli : quelles <strong>couches</strong> existent,
+        quels <strong>composants</strong> s’y trouvent et <strong>comment elles communiquent</strong>.
+      </p>
+      <div class="grid-2">
+        <div class="flow">
+          <h3>Quand l’utiliser</h3>
+          <ul>
+            <li>Pour présenter l’architecture à un reviewer (vue “cartographique”).</li>
+            <li>Pour expliciter le <strong>pattern Façade</strong> entre Présentation et Métier.</li>
+          </ul>
+          <h3>Ce que tu dois montrer pour HBnB</h3>
+          <ul>
+            <li><strong>Presentation</strong> : Services / API (contrôleurs REST).</li>
+            <li><strong>Business Logic</strong> : Façade d’application + Services (User/Place/Review/Amenity).</li>
+            <li><strong>Persistence</strong> : Repositories (ou DAOs) + Base de données.</li>
+            <li>Flèches : <em>API → Façade → Services → Repos → DB</em>.</li>
+          </ul>
+          <h3>Checklist livrable</h3>
+          <ul class="checklist">
+            <li>3 paquets nommés + leurs composants principaux.</li>
+            <li>Façade visible comme point d’entrée unique du métier.</li>
+            <li>Dépendances <em>uni-directionnelles</em> (du haut vers le bas).</li>
+          </ul>
+        </div>
+        <aside class="note">
+          <h4>Pourquoi la <em>Façade</em> ?</h4>
+          <p>
+            Elle <strong>simplifie</strong> l’API côté Présentation, <strong>masque la complexité</strong> du domaine,
+            et centralise la <strong>politique</strong> (transactions, sécurité, validation transversale).
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- CLASSES -->
+    <section id="classes" class="card">
+      <h2>Diagramme de <span class="tag">Classe</span> — Business Logic</h2>
+      <p class="lead">
+        <strong>À quoi ça sert ?</strong> Décrire la <em>structure</em> du domaine : classes, attributs, méthodes et <strong>relations</strong> (héritage, associations…).
+      </p>
+      <div class="grid-2">
+        <div class="flow">
+          <h3>Quand l’utiliser</h3>
+          <ul>
+            <li>Pour montrer <strong>qui hérite de qui</strong> (ex. <code>BaseEntity</code> → entités).</li>
+            <li>Pour fixer les <strong>responsabilités</strong> et attributs clés (UUID, timestamps, etc.).</li>
+          </ul>
+          <h3>Ce que tu dois montrer pour HBnB</h3>
+          <ul>
+            <li><code>BaseEntity</code> : <code>id</code> (UUID4), <code>created_at</code>, <code>updated_at</code>.</li>
+            <li><code>User</code>, <code>Place</code>, <code>Review</code>, <code>Amenity</code> héritent de <code>BaseEntity</code>.</li>
+            <li>Relations : <code>User</code> 1..* <code>Place</code> (owner), <code>Place</code> *..* <code>Amenity</code>,
+                <code>Place</code> 1..* <code>Review</code>, <code>User</code> 1..* <code>Review</code>.</li>
+          </ul>
+          <h3>Checklist livrable</h3>
+          <ul class="checklist">
+            <li>Attributs avec types (au moins ceux des specs).</li>
+            <li>Multiplicités correctement posées.</li>
+            <li>Héritage clair et dépendances minimales.</li>
+          </ul>
+        </div>
+        <aside class="note">
+          <h4>Astuce</h4>
+          <p>
+            Garde les <strong>méthodes</strong> au strict nécessaire (ex. <code>avg_rating()</code> sur <code>Place</code>),
+            et laisse les <strong>règles transverses</strong> (auth, transactions) aux services.
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- SEQUENCES -->
+    <section id="sequences" class="card">
+      <h2>Diagrammes de <span class="tag">Séquence</span> — 4 API clés</h2>
+      <p class="lead">
+        <strong>À quoi ça sert ?</strong> Montrer <em>l’ordre</em> des appels entre couches pour un <strong>use-case précis</strong>.
+      </p>
+      <div class="grid-2 flow">
+        <div class="seq-block">
+          <h3>1) Inscription (User Registration)</h3>
+          <ol>
+            <li>API reçoit <code>POST /users</code>.</li>
+            <li>Façade → <code>UserService.register()</code>, validation + hash.</li>
+            <li>Repo enregistre et retourne l’utilisateur.</li>
+            <li>API renvoie <code>201 Created</code> + payload.</li>
+          </ol>
+        </div>
+        <div class="seq-block">
+          <h3>2) Création d’un Place</h3>
+          <ol>
+            <li>API reçoit <code>POST /places</code> (owner_id, titre, …).</li>
+            <li>Service vérifie l’owner et les champs, puis sauvegarde.</li>
+            <li>Retour <code>201</code> + Place.</li>
+          </ol>
+        </div>
+        <div class="seq-block">
+          <h3>3) Soumission de Review</h3>
+          <ol>
+            <li>API reçoit <code>POST /places/{id}/reviews</code>.</li>
+            <li>Service charge <em>Place</em> + <em>User</em>, valide la note (1..5).</li>
+            <li>Repo enregistre la review → retour <code>201</code>.</li>
+          </ol>
+        </div>
+        <div class="seq-block">
+          <h3>4) Liste des Places</h3>
+          <ol>
+            <li>API reçoit <code>GET /places?filters</code>.</li>
+            <li>Service relaie vers Repo avec critères.</li>
+            <li>Retour <code>200</code> + liste.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Conseil :</strong> nomme les lifelines selon tes composants réels (API, Façade, *Service*, *Repository*, DB) pour que le reviewer
+        fasse le lien immédiatement avec ton code.
+      </div>
+    </section>
+
+    <!-- GLOSSAIRE -->
+    <section id="glossaire" class="card">
+      <h2>Glossaire UML — symboles essentiels (avec mini-illustrations)</h2>
+      <div class="glossary">
+        <!-- Association -->
+        <article class="g-item">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 120 40" role="img">
+              <line x1="10" y1="20" x2="110" y2="20" stroke="currentColor" stroke-width="3"/>
+            </svg>
+          </div>
+          <h3>Association</h3>
+          <p>Relie deux classes qui collaborent (ex. <em>Place</em>—<em>Review</em>). Ajouter la <strong>multiplicité</strong> (1..*, 0..1...).</p>
+        </article>
+
+        <!-- Agrégation -->
+        <article class="g-item">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 140 40">
+              <polygon points="20,20 30,10 40,20 30,30" fill="white" stroke="currentColor" stroke-width="2"/>
+              <line x1="40" y1="20" x2="130" y2="20" stroke="currentColor" stroke-width="3"/>
+            </svg>
+          </div>
+          <h3>Agrégation</h3>
+          <p>“A a des B” (losange <em>blanc</em>) : le tout peut exister sans les parties.</p>
+        </article>
+
+        <!-- Composition -->
+        <article class="g-item">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 140 40">
+              <polygon points="20,20 30,10 40,20 30,30" fill="currentColor"/>
+              <line x1="40" y1="20" x2="130" y2="20" stroke="currentColor" stroke-width="3"/>
+            </svg>
+          </div>
+          <h3>Composition</h3>
+          <p>“A est composé de B” (losange <em>plein</em>) : vie des parties <strong>dépend</strong> du tout.</p>
+        </article>
+
+        <!-- Héritage / Généralisation -->
+        <article class="g-item">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 160 50">
+              <polygon points="150,25 130,15 130,35" fill="white" stroke="currentColor" stroke-width="2"/>
+              <line x1="10" y1="25" x2="130" y2="25" stroke="currentColor" stroke-width="3"/>
+            </svg>
+          </div>
+          <h3>Héritage (Généralisation)</h3>
+          <p>Flèche triangle <em>blanc</em> vers la super-classe (ex. <em>User</em> → <em>BaseEntity</em>).</p>
+        </article>
+
+        <!-- Réalisation (interface) -->
+        <article class="g-item">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 160 50">
+              <polygon points="150,25 130,15 130,35" fill="white" stroke="currentColor" stroke-width="2"/>
+              <line x1="10" y1="25" x2="130" y2="25" stroke="currentColor" stroke-width="3" stroke-dasharray="6 6"/>
+            </svg>
+          </div>
+          <h3>Réalisation</h3>
+          <p>Ligne <em>pointillée</em> + triangle vers l’interface (ou classe abstraite).</p>
+        </article>
+
+        <!-- Dépendance -->
+        <article class="g-item">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 160 40">
+              <line x1="10" y1="20" x2="140" y2="20" stroke="currentColor" stroke-width="3" stroke-dasharray="6 6"/>
+            </svg>
+          </div>
+          <h3>Dépendance</h3>
+          <p>Relation “utilise” plus faible (ex. Service → Repository via interface).</p>
+        </article>
+
+        <!-- Multiplicités -->
+        <article class="g-item">
+          <div class="icon mult" aria-hidden="true">1..*, 0..1, 1..1</div>
+          <h3>Multiplicité</h3>
+          <p>Combien d’instances sont reliées (ex. <em>User</em> 1..* <em>Place</em>).</p>
+        </article>
+
+        <!-- Package -->
+        <article class="g-item">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 120 70">
+              <rect x="10" y="25" width="100" height="35" fill="none" stroke="currentColor" stroke-width="2"/>
+              <rect x="10" y="15" width="50" height="10" fill="none" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+          <h3>Package</h3>
+          <p>Regroupe des classes/composants. Sert aux vues <em>architecture</em> (couches).</p>
+        </article>
+
+        <!-- Façade -->
+        <article class="g-item">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 160 60">
+              <rect x="10" y="10" width="60" height="40" rx="6" class="box"/>
+              <text x="40" y="36" text-anchor="middle" class="txt">API</text>
+              <rect x="90" y="10" width="60" height="40" rx="6" class="box"/>
+              <text x="120" y="36" text-anchor="middle" class="txt">Façade</text>
+              <line x1="70" y1="30" x2="90" y2="30" stroke="currentColor" stroke-width="3"/>
+            </svg>
+          </div>
+          <h3>Façade</h3>
+          <p>Point d’entrée unique vers le domaine ; simplifie et protège la couche métier.</p>
+        </article>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p>HBnB — UML Part&nbsp;1 • Ce document peut être versionné dans <code>holbertonschool-hbnb/part1/</code>.</p>
+    </footer>
+  </main>
+</body>
+</html>
